@@ -6,3 +6,8 @@ output:
     toc_depth: 2
 ---
 
+```{bash}
+wget -i R1_data
+```
+
+d
