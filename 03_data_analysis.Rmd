@@ -152,6 +152,7 @@ Cete étape permet d'obtenir chacun de nos échantillons, et de comparer toutes 
 #Assignation taxonomique
 
 ```{r}
+library(dada2)
 taxa <- assignTaxonomy(seqtab.nochim, "~/EcoG2-CC2/silva_nr99_v138_train_set.fa.gz", multithread=TRUE)
 ```
 On va comparer les séquences de nos échantillons grâce à la base de données Silva.
@@ -171,9 +172,8 @@ Après cette assignation taxonomique, nous retrouvons majoritairement un grand n
 La variable taxa.print a reçu toutes les séquences des échantillons avec une taxonomie assignée. Finalement 1557 taxa ont été retrouvés.
 
 ```{r}
-save.image(file="02_Dada2_tutorial_FinalEnv")
+save.image(file="02_data_analysis_FinalEnv")
 ```
 
-
-
+f
 

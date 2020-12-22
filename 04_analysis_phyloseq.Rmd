@@ -1,0 +1,35 @@
+---
+title: "CC3 Microbiote des vaches laitières"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r}
+library(ggplot2)
+library(dada2)
+library(phyloseq)
+library(Biostrings)
+library(DECIPHER)
+```
+
+```{r}
+load("~/EcoG2-CC3/02_data_analysis_FinalEnv")
+```
+
+```{r}
+samples.out <- rownames(seqtab.nochim)
+profondeur <- sapply(strsplit(samples.out, "_"), `[`, 2)
+profondeur <- (sapply(strsplit(samples.out, "_"), `[`, 3))
+date <- substr(profondeur,1,11)
+samdf <- data.frame(Profondeur=profondeur, Date=date)
+samdf$Profondeur <- c("Fond","Fond","Fond","Fond","Fond", "Median","Median","Surface","Surface","Surface","Surface")
+samdf$Date[samdf$Profondeur==11] <- c("mars","sept")
+rownames(samdf) <- samples.out
+```
+
+
+
+
+
