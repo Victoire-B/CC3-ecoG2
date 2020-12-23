@@ -20,14 +20,56 @@ load("~/EcoG2-CC3/02_data_analysis_FinalEnv")
 
 ```{r}
 samples.out <- rownames(seqtab.nochim)
-profondeur <- sapply(strsplit(samples.out, "_"), `[`, 2)
-profondeur <- (sapply(strsplit(samples.out, "_"), `[`, 3))
-date <- substr(profondeur,1,11)
-samdf <- data.frame(Profondeur=profondeur, Date=date)
-samdf$Profondeur <- c("Fond","Fond","Fond","Fond","Fond", "Median","Median","Surface","Surface","Surface","Surface")
-samdf$Date[samdf$Profondeur==11] <- c("mars","sept")
+low_yield <- sapply(strsplit(samples.out, "_"), `[`, 1)
+high_yield <- (sapply(strsplit(samples.out, "_"), `[`, 1))
+samdf <- data.frame(Low_yield=low_yield, High_yield=high_yield)
+samdf$Rendement <- c("Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield")
 rownames(samdf) <- samples.out
 ```
+
+# Ordination  
+
+```{r}
+# Transform data to proportions as appropriate for Bray-Curtis distances
+ps.prop <- transform_sample_counts(ps, function(tax_table) tax_table/sum(tax_table))
+ord.pcoa.bray <- ordinate(ps.prop, method="PCoA", distance="bray")
+```
+
+## Visualisation de l'ordination
+
+```{r}
+ord <-plot_ordination(ps.prop, ord.pcoa.bray, color="Rendement", ellipse = TRUE, shape = "Phyla", title="Bray PCoA")
+```
+
+```{r}
+ordiellipse(ord, groups = "Rendement", display = "sites", kind = "sd", conf = 0.95, col = "black", w = NULL)
+```
+
+
+# Bar plot
+## Au niveau du Phylum 
+
+```{r}
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, x="Date", fill="Phylum", title="Diversité des Phyla les plus abondants") + facet_wrap(~Rendement, scales="free_x")
+```
+
+## Au niveau du genre 
+
+```{r}
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, x="Date", fill="Phylum", title="Diversité des genre les plus abondants") + facet_wrap(~Rendement, scales="free_x")
+```
+
+
+
+
+
+
 
 
 
