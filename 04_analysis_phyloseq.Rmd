@@ -22,6 +22,7 @@ load("~/EcoG2-CC3/02_data_analysis_FinalEnv")
 samples.out <- rownames(seqtab.nochim)
 low_yield <- sapply(strsplit(samples.out, "_"), `[`, 1)
 high_yield <- (sapply(strsplit(samples.out, "_"), `[`, 1))
+
 samdf <- data.frame(Low_yield=low_yield, High_yield=high_yield)
 samdf$Rendement <- c("Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","Low_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield","High_yield")
 rownames(samdf) <- samples.out
@@ -29,6 +30,13 @@ rownames(samdf) <- samples.out
 
 # Ordination  
 
+
+```{r}
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+ps
+```
 ```{r}
 # Transform data to proportions as appropriate for Bray-Curtis distances
 ps.prop <- transform_sample_counts(ps, function(tax_table) tax_table/sum(tax_table))
@@ -38,7 +46,7 @@ ord.pcoa.bray <- ordinate(ps.prop, method="PCoA", distance="bray")
 ## Visualisation de l'ordination
 
 ```{r}
-ord <-plot_ordination(ps.prop, ord.pcoa.bray, color="Rendement", ellipse = TRUE, shape = "Phyla", title="Bray PCoA")
+ord <-plot_ordination(ps.prop, ord.pcoa.bray, color="Rendement", shape = "Genus", title="Bray PCoA")
 ```
 
 ```{r}
@@ -50,10 +58,10 @@ ordiellipse(ord, groups = "Rendement", display = "sites", kind = "sd", conf = 0.
 ## Au niveau du Phylum 
 
 ```{r}
-top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:10]
 ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 ps.top20 <- prune_taxa(top20, ps.top20)
-plot_bar(ps.top20, x="Date", fill="Phylum", title="Diversité des Phyla les plus abondants") + facet_wrap(~Rendement, scales="free_x")
+plot_bar(ps.top20, x="Rendement", fill="Phylum", title="Diversité des Phyla les plus abondants") + facet_wrap(~Rendement, scales="free_x")
 ```
 
 ## Au niveau du genre 
