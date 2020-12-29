@@ -175,5 +175,4 @@ La variable taxa.print a reçu toutes les séquences des échantillons avec une 
 save.image(file="02_data_analysis_FinalEnv")
 ```
 
-f
 
