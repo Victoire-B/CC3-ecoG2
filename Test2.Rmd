@@ -353,9 +353,9 @@ heatmap.2(dataHL, scale = "row", col = bluered(100),
 
 ```{r}
 # Corrélation par paires entre les échantillons (colonnes)
-cols.cor <- cor(dataHM, use = "pairwise.complete.obs", method = "pearson")
+cols.cor <- cor(dataHL, use = "pairwise.complete.obs", method = "pearson")
 # Corrélation par paires entre les lignes (gènes)
-rows.cor <- cor(t(dataHM), use = "pairwise.complete.obs", method = "pearson")
+rows.cor <- cor(t(dataHL), use = "pairwise.complete.obs", method = "pearson")
 
 ## Clustering par ligne et par colonne à l'aide d'une corrélation 
 hclust.col <- hclust(as.dist(1-cols.cor)) 
@@ -364,7 +364,7 @@ hclust.row <- hclust(as.dist(1-rows.cor))
 
 # Créer le heatmap
 library("gplots")
-heatmap.2(dataHM, scale = "row", col = bluered(100), 
+heatmap.2(dataHL, scale = "row", col = bluered(100), 
           trace = "none", density.info = "none",
           Colv = as.dendrogram(hclust.col),
           Rowv = as.dendrogram(hclust.row)
@@ -372,8 +372,334 @@ heatmap.2(dataHM, scale = "row", col = bluered(100),
 ```
 
 
+```{r}
+ library("corrplot")
+    D1=Table_gen_LY
+    D2=Table_gen_HY
+    CorTest=cor(D1, y=D2, use = "everything", method = "pearson")
+    CorGraph=corrplot(CorTest, method = "circle", col = colorRampPalette(c("blue","white","red"))(200), title = "Pearson's Correlation of High-Fat Sugar at 12 weeks", tl.cex = .75, tl.col = "Black",diag = TRUE, cl.ratio = 2.25)
+```
+
+```{r}
+df <- scale(Table_gen_HY)
+```
+```{r}
+heatmap(df, scale = "row", method = "pearson")
+```
+
+```{r}
+head(Table_gen_HY)
+```
+```{r}
+cor(Table_gen_HY)
+```
 
 
+```{r}
+library(ggpubr)
+
+my_data <- Table_gen_HY
+my_data$NH3_N <- factor(my_data$NH3_N)
+str(my_data)
+```
+
+```{r}
+ggscatter(my_data, x = "Propionate", y = "Acetate",
+          add = "reg.line", conf.int = TRUE,
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Weight (1000 lbs)", ylab = "Miles/ (US) gallon")
+```
+
+```{r}
+res <- cor.test(my_data$Propionate, my_data$Acetate, method = "pearson")
+res
+```
+
+```{r}
+str(res)
+```
+```{r}
+res$p.value
+```
+
+```{r}
+res$estimate
+```
+
+
+# Création d'un table pour l'abondance relative des genres
+
+```{r}
+HY = c(29.14, 7.20, 7.69, 4.21, 0.47, 3.55, 4.41, 3.36, 2.67, 3.12, 2.00, 2.91, 1.87, 1.36, 1.93) ; LY = c(37.48, 4.12, 3.57, 5.96, 8.41, 3.44, 1.36, 2.21, 2.87, 2.00, 2.20, 1.18, 1.99, 1.55, 0.80)
+Table_ar_gen <- data.frame(x = HY, y = LY) 
+# Renommer les colonnes
+colnames(Table_ar_gen) <- c("HY", "LY")
+# Renommer les lignes
+rownames(Table_ar_gen) <-c("Prevotella_1", "Ruminococcaceae_NK4A214_group", "Succiniclasticum", "Prevotellaceae", "Prevotella_7", "Bacteroidales_S24_7_group", "Ruminococcus_2", "Bacteroidales_BS11", "Rikenellaceae_RC9_gut_group", "Christensenellaceae_R_7_group", "Prevotellaceae_UCG_003", "Lachnospiraceae_NK3A20_group", "Ruminococcaceae_UCG_014", "Prevotellaceae_UCG_001",
+ "Eubacterium_coprostanoligenes_group")
+```
+
+# Test de student 
+```{r}
+par(mar=c(5,20,1,2))
+barplot(t(Table_ar_gen),beside=T,ylim=c(0,50), xlim=c(0,40), xlab="Genre",axis.lty="solid",horiz=T, las=1, col=c(" dark green","dark orange"), legend=TRUE, xpd = FALSE)
+
+```
+## Intervale de confiance 
+
+```{r}
+# prevotella 1
+x_prev1<-c(29.14, 37.48)
+# test de student pour échantillon unique
+res_prev1<-t.test(x_prev1, mu=0)
+res_prev1 # Affichage du résultat du test 
+```
+```{r}
+# Ruminococcaceae_NK4A214_group
+x2<-c(7.20, 4.12)
+# test de student pour échantillon unique
+res2<-t.test(x2, mu=0)
+res2 # Affichage du résultat du test 
+```
+
+```{r}
+# Succiniclasticum
+x3<-c(7.69, 3.57)
+# test de student pour échantillon unique
+res3<-t.test(x3, mu=0)
+res3 # Affichage du résultat du test 
+```
+```{r}
+# Prevotellaceae
+x4<-c(4.21, 5.96)
+# test de student pour échantillon unique
+res4<-t.test(x4, mu=0)
+res4 # Affichage du résultat du test 
+```
+
+```{r}
+# Prevotella_7
+x5<-c(0.47,8.41)
+# test de student pour échantillon unique
+res5<-t.test(x5, mu=0)
+res5 # Affichage du résultat du test 
+```
+
+```{r}
+# Bacteroidales_S24_7_group
+x6<-c(3.55,3.44)
+# test de student pour échantillon unique
+res6<-t.test(x6, mu=0)
+res6 # Affichage du résultat du test 
+```
+
+```{r}
+# Ruminococcus_2
+x7<-c(4.41,1.36)
+# test de student pour échantillon unique
+res7<-t.test(x7, mu=0)
+res7 # Affichage du résultat du test 
+```
+
+
+```{r}
+# Bacteroidales_BS11
+x8<-c(3.36,2.21)
+# test de student pour échantillon unique
+res8<-t.test(x8, mu=0)
+res8 # Affichage du résultat du test 
+```
+
+```{r}
+# Rikenellaceae_RC9_gut_group
+x9<-c(2.67,2.87)
+# test de student pour échantillon unique
+res9<-t.test(x9, mu=0)
+res9 # Affichage du résultat du test 
+```
+
+```{r}
+# Christensenellaceae_R_7_group
+x10<-c(3.12,2.00)
+# test de student pour échantillon unique
+res10<-t.test(x10, mu=0)
+res10 # Affichage du résultat du test 
+```
+
+```{r}
+# Prevotellaceae_UCG_003
+x11<-c(2.00,2.20)
+# test de student pour échantillon unique
+res11<-t.test(x11, mu=0)
+res11 # Affichage du résultat du test 
+```
+
+```{r}
+# Lachnospiraceae_NK3A20_group
+x12<-c(2.91,1.18)
+# test de student pour échantillon unique
+res12<-t.test(x12, mu=0)
+res12 # Affichage du résultat du test 
+```
+
+
+```{r}
+# Ruminococcaceae_UCG_014
+x13<-c(1.87,1.99)
+# test de student pour échantillon unique
+res13<-t.test(x13, mu=0)
+res13 # Affichage du résultat du test 
+```
+
+```{r}
+# Prevotellaceae_UCG_001
+x14<-c(1.36,1.55)
+# test de student pour échantillon unique
+res14<-t.test(x14, mu=0)
+res14 # Affichage du résultat du test 
+```
+
+```{r}
+# Eubacterium_coprostanoligenes_group
+x15<-c(1.93,0.80)
+# test de student pour échantillon unique
+res15<-t.test(x15, mu=0)
+res15 # Affichage du résultat du test 
+```
+
+
+```{r}
+p_value = c(0.07928, 0.1691, 0.2233, 0.1085, 0.4645, 0.01002, 0.3096, 0.1296, 0.02297, 0.1371, 0.03029, 0.2548, 0.01978, 0.04151, 0.2498)
+Table_pvalue <- data.frame(x = p_value) 
+# Renommer les colonnes
+colnames(Table_pvalue) <- c("p_value")
+# Renommer les lignes
+rownames(Table_pvalue) <-c("Prevotella_1", "Ruminococcaceae_NK4A214_group", "Succiniclasticum", "Prevotellaceae", "Prevotella_7", "Bacteroidales_S24_7_group", "Ruminococcus_2", "Bacteroidales_BS11", "Rikenellaceae_RC9_gut_group", "Christensenellaceae_R_7_group", "Prevotellaceae_UCG_003", "Lachnospiraceae_NK3A20_group", "Ruminococcaceae_UCG_014", "Prevotellaceae_UCG_001",
+ "Eubacterium_coprostanoligenes_group")
+```
+
+### Les différences de proportion
+
+```{r}
+DIFF = c(-8.34,3.08,4.12,-1.75,-7.94,0.11,3.05,1.15,-0.2,1.12,-0.2,1.73,-0.12,-0.19,1.13) 
+diff<- data.frame(x = DIFF) 
+# Renommer les colonnes
+colnames(diff) <- c("DIFF")
+# Renommer les lignes
+rownames(diff) <-c("0.07928", "0.1691", "0.2233", "0.1085", "0.4645", "0.01002", "0.3096", "0.1296", "0.02297", "0.1371", "0.03029", "0.2548", "0.01978", "0.04151", "0.2498")
+```
+
+```{r}
+vec <- c(-8.34,3.08,4.12,-1.75,-7.94,0.11,3.05,1.15,-0.2,1.12,-0.2,1.73,-0.12,-0.19,1.13)
+```
+
+```{r}
+se = sd(vec) / sqrt(length(vec))
+```
+
+
+```{r}
+alpha=0.05
+t=qt((1-alpha)/2 + .5, length(vec)-1)   # tend to 1.96 if sample size is big enough
+CI=t*se
+```
+
+```{r}
+Diffpval <- cbind(Table_pvalue, DIFF)
+```
+
+
+
+```{r}
+ggplot(Diffpval) +
+  geom_bar( aes(x=p_value, y=DIFF), stat="identity", fill="blue", alpha=1) +
+  geom_errorbar( aes(x=p_value, ymin=DIFF-CI, ymax=DIFF+CI), width=0.4, colour="orange", alpha=0.3, size=1) +
+  ggtitle("using confidence interval")
+```
+
+```{r}
+df <- data.frame(x =1:15,
+                 Prevotella_1 =runif(10,-19.67487, 86.29487),
+                 Ruminococcaceae_NK4A214_group =runif(10,-13.90756, 25.22756),
+                 Succiniclasticum =runif(10,-20.54478  31.80478),
+                 Prevotellaceae =runif(10, -6.032929 16.202929),
+                 Prevotella_7 =runif(10, -46.00363  54.88363),
+                 Bacteroidales_S24_7_group =runif(10, 2.796159 4.193841),
+                 Ruminococcus_2 =runif(10, 2.796159 4.193841),
+                 Bacteroidales_BS11
+                 Rikenellaceae_RC9_gut_group
+                 Christensenellaceae_R_7_group
+                 Prevotellaceae_UCG_003
+                 Lachnospiraceae_NK3A20_group
+                 Ruminococcaceae_UCG_014
+                 Prevotellaceae_UCG_001
+                 Eubacterium_coprostanoligenes_group)
+
+require(ggplot2)
+ggplot(df, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymax = U, ymin = L))
+```
+
+```{r}
+library(plotrix)
+
+y <- runif(15)
+err <- runif(10)
+plotCI(1:10, y, err, main = "Basic plotCI")
+```
+
+```{r}
+plotCI (x= DIFF, y = NULL, uiw =10, liw = -25, ui = NULL, li = NULL, err = "y",
+  sfrac = 0.01, gap = 0, slty = par ("lty"), add = FALSE, scol = NULL, pt.bg = par ("bg"))
+
+```
+
+```{r}
+ y <-DIFF
+ err <-runif (15)
+ plotCI (DIFF, y, err, main = "Basic plotCI")
+ plotCI (DIFF, y, err, 2 * err, lwd = 2, col = "red", scol = "blue",
+  main = "Ajouter des couleurs aux points et aux barres d'erreur")
+ err.x <-runif (15)
+ err.y <-runif (15)
+ plotCI (DIFF, y, err.y, pt.bg = par ("bg"), pch = 21, xlim = c (0,11),
+  main = "plotCI avec espace supplémentaire sur l'axe x")
+ plotCI (DIFF, y, err.x, pt.bg = par ("bg"), pch = 21, err = "x", add = TRUE)
+ mtext ("pour ajouter des barres d'erreur horizontales", 3,0.5)
+
+```
+
+
+```{r}
+plotmeans(DIFF ~ p_value, data = diff, frame = FALSE,
+          mean.labels = FALSE, connect = FALSE, p=0.95, bars=TRUE,
+          ci.label=FALSE, n.label=TRUE, text.n.label="n=",
+          digits=getOption("digits"), col="black", barwidth=1,
+          barcol="blue", ccol=
+          col, use.t=TRUE,
+          lwd=par("lwd"))
+```
+```{r}
+# Load ggplot2
+library(ggplot2)
+data <- data.frame(
+  name=c("0.07928", "0.1691", "0.2233", "0.1085", "0.4645", "0.01002", "0.3096", "0.1296", "0.02297", "0.1371", "0.03029", "0.2548", "0.01978", "0.04151", "0.2498"),
+  value=c(-8.34,3.08,4.12,-1.75,-7.94,0.11,3.05,1.15,-0.2,1.12,-0.2,1.73,-0.12,-0.19,1.13),
+  sd=c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+ 
+# Most basic error bar
+ggplot(data) +
+    geom_bar( aes(x=name, y=value), stat="identity", fill="skyblue", alpha=0.7) +
+    geom_errorbar( aes(x=name, ymin=value-sd, ymax=value+sd), width=0.4, colour="orange", alpha=0.95, size=1)
+```
+
+```{r}
+ggplot(Diffpval) +
+  geom_bar( aes(x=p_value, y=DIFF), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=p_value, ymin=DIFF-CI, ymax=DIFF+CI), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("using confidence interval")
+```
 
 
 
